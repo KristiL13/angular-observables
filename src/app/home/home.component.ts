@@ -31,7 +31,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     // });
 
     // Custom Observablei loomine: create meetod loob observable'i.
-    // See tuleb kohe koos parameetriga n.ö. observer.
+    // See tuleb kohe koos parameetriga nö observer.
     // Observer on see osa, mis on huvitatud uutest andmetest, vigadest, et observable
     // jõudis oma tegevusega lõppu.
     // Seda const osa võiks teha ka lihtsalt siin propertyna või kusagil serviceis.
@@ -39,6 +39,20 @@ export class HomeComponent implements OnInit, OnDestroy {
       let count = 0;
       setInterval(() => {
         observer.next(count); // to emit a new value
+        if (count === 2) {
+        // if (count === 5) { // Kui on see tingimus, siis kui lõpetab vea tõttu, siis
+        // siia completei üldse ei jõuagi.
+          observer.complete(); // peale completei observable lõpetab oma tegevuse
+          // ja uusi väärtuseid ei väljastata. http request ise jõuab lõppu.
+        }
+        if (count > 3) {
+          // Kui error tuleb, siis observable ei tekita uusi väärtusi, see nö sureb.
+          // Seepärast ei ole sel juhul oluline ka unsubscribeida. Sa saad ära liikudes
+          // unsubscribeida, aga see pole tarvilik, kuna observable oli juba surnud.
+          // Samas sa ei pruukinud seda ära minnes veel teada.
+          // Error cancels the observable, it does not complete it.
+          observer.error(new Error('Count is greater than 3!'));
+        }
         count++;
         // observer.error(); // veaga tegelemine
         // observer.complete(); // kui on valmis asjad
@@ -47,7 +61,18 @@ export class HomeComponent implements OnInit, OnDestroy {
     // siin subscribein oma custom observableile.
     this.firstObservableSubscription = customIntervalObservable.subscribe(data => {
       console.log(data);
-    });
+    }, error => {
+      console.log(error);
+      alert(error.message);
+      // veaga saab siin muudki teha, kui seda konsooli logida. Nt näidata veateadet,
+      // saata viga backendi ja seda seal logida jne.
+    }, () => { // completion
+      // you don't need to unsubscribe if your observable did complete. But you might
+      // not know it did, so you can still unsubscribe without getting errors.
+      // Kui saab vea, siis siia ei jõua.
+      console.log('Completed');
+    }
+    );
   }
 
   ngOnDestroy(): void {
