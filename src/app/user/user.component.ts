@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 
+import { UserService } from '../user.service';
+
 @Component({
   selector: 'app-user',
   templateUrl: './user.component.html',
@@ -9,7 +11,8 @@ import { ActivatedRoute, Params } from '@angular/router';
 export class UserComponent implements OnInit {
   id: number;
 
-  constructor(private route: ActivatedRoute) {
+  constructor(private route: ActivatedRoute,
+    private userService: UserService) {
   }
 
   ngOnInit() {
@@ -18,5 +21,9 @@ export class UserComponent implements OnInit {
     });
     // Need observableid, mis tulevad Angulariga kaasa, nendest
     // unsubscribeib Angular meie eest.
+  }
+
+  onActivate() {
+    this.userService.activatedEmitter.emit(true);
   }
 }
