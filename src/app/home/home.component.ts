@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 
-import { interval, Subscription } from 'rxjs';
+import { interval, Subscription, Observable } from 'rxjs';
 
 @Component({
   selector: 'app-home',
@@ -25,8 +25,28 @@ export class HomeComponent implements OnInit, OnDestroy {
     // Angulariga ise kaasas olevad observable-id teevad seda automaatselt ise.
     // subscribe() meetod tagastab Subscriptioni. Me ei säilita muutujas
     // observablei, vaid subscriptionit.
-    this.firstObservableSubscription = interval(1000).subscribe(count => {
-      console.log(count);
+
+    // this.firstObservableSubscription = interval(1000).subscribe(count => {
+    //   console.log(count);
+    // });
+
+    // Custom Observablei loomine: create meetod loob observable'i.
+    // See tuleb kohe koos parameetriga n.ö. observer.
+    // Observer on see osa, mis on huvitatud uutest andmetest, vigadest, et observable
+    // jõudis oma tegevusega lõppu.
+    // Seda const osa võiks teha ka lihtsalt siin propertyna või kusagil serviceis.
+    const customIntervalObservable = Observable.create((observer) => {
+      let count = 0;
+      setInterval(() => {
+        observer.next(count); // to emit a new value
+        count++;
+        // observer.error(); // veaga tegelemine
+        // observer.complete(); // kui on valmis asjad
+      } , 1000);
+    });
+    // siin subscribein oma custom observableile.
+    this.firstObservableSubscription = customIntervalObservable.subscribe(data => {
+      console.log(data);
     });
   }
 
