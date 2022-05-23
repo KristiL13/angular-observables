@@ -1,6 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 
 import { interval, Subscription, Observable } from 'rxjs';
+import { map, filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-home',
@@ -62,8 +63,29 @@ export class HomeComponent implements OnInit, OnDestroy {
     // Peamiselt ei kirjuta oma observableid, nagu siin ülal. Aga tegelen dataga,
     // vigadega ja mida teha kui on complete, nagu siin allpool.
 
+    // Operators:
+    // every observable has a pipe method, it's built into rxjs.
+    // Pipei idee koos operatoritega on, et muuta sissetulevaid andmeid selliseks,
+    // et mul on pärast mugavam ja mõistlikum neid kasutada.
+    // Pipe meetod võtab vastu piiramatul hulgal argumente ja seal saab neid operatoreid
+    // laduda üksteise otsa nii palju kui mul tarvis on. learnrxjs.io/operators
+    customIntervalObservable.pipe(map((data: number) => {
+      // see data siin ülal on see, mille ma muidu saaksin subscribeides siin all.
+      return 'Round: ' + (data + 1);
+    }));
+    // Aga see siin ülal ei muuda olemasolevat observablei. Ma pean subscribeima
+    // mitte algsele observableile edaspidi vaid sellele asjale, mis on peale pipei. Ehk:
+
     // siin subscribein oma custom observableile.
-    this.firstObservableSubscription = customIntervalObservable.subscribe(data => {
+    this.firstObservableSubscription = customIntervalObservable.pipe(filter(data => {
+      return data > 0; // siin tuleb returnida true või false ehk tingimus
+    }),
+      map((data: number) => {
+      // see data siin ülal on see, mille ma muidu saaksin subscribeides siin all.
+      return 'Round: ' + (data + 1);
+    })).subscribe(data => {
+    // this.firstObservableSubscription = customIntervalObservable.subscribe(data => {
+      // console.log('Round: ' + (data + 1));
       console.log(data);
     }, error => {
       console.log(error);
