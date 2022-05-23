@@ -58,6 +58,10 @@ export class HomeComponent implements OnInit, OnDestroy {
         // observer.complete(); // kui on valmis asjad
       } , 1000);
     });
+
+    // Peamiselt ei kirjuta oma observableid, nagu siin ülal. Aga tegelen dataga,
+    // vigadega ja mida teha kui on complete, nagu siin allpool.
+
     // siin subscribein oma custom observableile.
     this.firstObservableSubscription = customIntervalObservable.subscribe(data => {
       console.log(data);
